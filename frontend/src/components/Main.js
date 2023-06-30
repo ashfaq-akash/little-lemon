@@ -3,8 +3,15 @@ import { Button, Image } from 'react-bootstrap'
 import logo from '../assets/images/Logo4.png'
 import banner from '../assets/images/banner.jpg'
 import { Container, Grid, Typography, Box } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
 
 function Main() {
+  const navigate = useNavigate()
+
+  function handleClick() {
+    navigate('/table-booking')
+  }
+
   return (
     <Container
       component='main'
@@ -42,9 +49,10 @@ function Main() {
             </Typography>
 
             <div className='mt-4'>
-              <Button variant='warning' size='lg'>
+              <Button variant='warning' size='lg' onClick={handleClick}>
                 Reserve table
               </Button>
+
               <Button variant='info' size='lg' className='ms-2'>
                 Order Online
               </Button>

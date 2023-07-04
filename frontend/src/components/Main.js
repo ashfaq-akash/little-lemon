@@ -9,7 +9,7 @@ function Main() {
   const navigate = useNavigate()
 
   function handleClick() {
-    navigate('/table-booking')
+    navigate('/reservation-form')
   }
 
   return (

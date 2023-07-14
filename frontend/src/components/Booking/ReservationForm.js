@@ -1,45 +1,43 @@
-import React, { useState } from 'react'
-import { Container } from 'react-bootstrap'
-import reservation from '../../assets/images/booking.jpg'
+import React from 'react'
+import { useState } from 'react'
+import { useFormik } from 'formik'
 import { useNavigate } from 'react-router-dom'
-import { Button } from 'react-bootstrap'
+
 import {
+  Box,
   Stepper,
   Step,
   StepLabel,
-  Typography,
-  CircularProgress,
+  Grid,
+  FormHelperText,
+  Container,
+  Button,
 } from '@mui/material'
-import { Formik, Form } from 'formik'
-import { styled } from '@mui/material/styles'
+import reservation from '../../assets/images/booking.jpg'
 
 import TableForm from './TableForm'
-import BookingForm from './BookingForm'
 import UserForm from './UserForm'
+import BookingForm from './BookingForm'
+import ConfirmationForm from './ConfirmationForm'
+import { date } from 'yup'
 
-const steps = ['Booking details', 'User details', 'Review your booking']
+const ReservationForm = () => {
+  const [activeStep, setActiveStep] = useState(0)
+  const steps = ['Booking details', 'User details', 'Review your booking']
 
-const useStyles = styled((theme) => ({
-  stepper: {
-    width: '25%', // Adjust the width value as per your requirements
-    //margin: '0 auto', // Center the stepper horizontally
-  },
-}))
+  const [data, setData] = useState({
+    date: null,
+    time: '',
+    numberofPeople: '',
+    tableNumber: '',
+    occasion: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    Comment: '',
+  })
 
-function _renderStepContent(step) {
-  switch (step) {
-    case 0:
-      return <TableForm />
-    case 1:
-      return <BookingForm />
-    case 2:
-      return <UserForm />
-    default:
-      return <div>Not Found</div>
-  }
-}
-
-function ReservationForm() {
   const backgroundStyles = {
     backgroundImage: `url(${reservation})`,
     backgroundSize: 'cover',
@@ -67,9 +65,42 @@ function ReservationForm() {
     navigate(-1)
   }
 
-  const [activeStep, setActiveStep] = useState(0)
-  const isLastStep = activeStep === steps.length - 1
-  const classes = useStyles()
+  const makeRequest = (formData) => {
+    // console.log('Form Submitted', formData)
+  }
+
+  const handleNext = (newData, final = false) => {
+    setData((prev) => ({ ...prev, ...newData }))
+    if (final) {
+      makeRequest(newData)
+      setActiveStep(steps.length)
+      return
+    }
+    setActiveStep((prevActiveStep) => prevActiveStep + 1)
+  }
+
+  const handleBack = (newData) => {
+    setData((prev) => ({ ...prev, ...newData }))
+    setActiveStep((prevActiveStep) => prevActiveStep - 1)
+  }
+
+  const formContent = (step) => {
+    switch (step) {
+      case 0:
+        return <TableForm next={handleNext} prev={handleBack} data={data} />
+      case 1:
+        return <UserForm prev={handleBack} next={handleNext} data={data} />
+      case 2:
+        return <BookingForm prev={handleBack} next={handleNext} data={data} />
+      case 3:
+        return <ConfirmationForm />
+      default:
+        return <div>404: Not Found</div>
+    }
+  }
+
+  console.log('data', data)
+  console.log(date)
 
   return (
     <React.Fragment>
@@ -80,13 +111,18 @@ function ReservationForm() {
         <div style={textStyles}>Reserve Your Table</div>
       </div>
       <div>
-        <Button variant='primary' onClick={goBack} className='mt-2 ms-2 mb-3'>
+        <Button
+          variant='contained'
+          onClick={goBack}
+          sx={{ marginTop: '10px', marginLeft: '5px' }}
+        >
           Go Back
         </Button>
       </div>
       <Stepper
         activeStep={activeStep}
         sx={{ width: '50%', marginLeft: '500px' }}
+        alternativeLabel
       >
         {steps.map((label) => (
           <Step key={label}>
@@ -94,7 +130,36 @@ function ReservationForm() {
           </Step>
         ))}
       </Stepper>
-      {/* <TableForm /> */}
+      {
+        <Grid container>
+          <Grid item xs={12} sx={{ padding: '20px' }}>
+            {formContent(activeStep)}
+          </Grid>
+          {/*     <div>
+          {activeStep === steps.length ? (
+            <div>
+              <Button onClick={handleReset}>Reset</Button>
+            </div>
+          ) : (
+            <div>
+              <div className='container'>
+                <Button disabled={activeStep === 0} onClick={handleBack}>
+                  Back
+                </Button>
+                <input
+                  type='submit'
+                  value={activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                  variant='contained'
+                  color='primary'
+                  onClick={handleNext}
+                  className='btn btn-primary'
+                />
+              </div>
+            </div>
+          )}
+        </div> */}
+        </Grid>
+      }
     </React.Fragment>
   )
 }
